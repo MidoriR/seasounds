@@ -8,7 +8,7 @@ This module contains all the functions to create your own dataset for classifica
 All data was collected from the Watkins Marine Mammals database.
 """
 
-
+import subprocess
 import time
 import os
 from urllib import request
@@ -134,4 +134,32 @@ def build_dataset(categories):
         for code in codes:
             code_links = get_links(code)
             download_links(code_links, category)
+    return
+
+
+def cut_sounds(sound_directory, time):
+    """Split file into specific time intervals.
+
+    Parameters
+    ----------
+    sound_file: str  path to the directory for the audio file
+    time: str duration of the splits
+
+    Returns
+    -------
+    None
+
+    """
+    target_path = f'{sound_directory}/split_{time}'
+    subprocess.run(f'mkdir {target_path}')
+    audio_files = os.listdir(sound_directory)
+    time_cmd = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "
+    for element in audio_files: 
+        output = subprocess.check_output(time_cmd + f'{sound_directory}/' + element, shell=True) 
+        if float(output) < 6:
+            subprocess.run(f'cp {sound_directory}/{element} split_wav/', shell=True) 
+        else: 
+            base, _ = element.split('.') 
+            subprocess.run(f'ffmpeg -i {sound_directory}/{element} \
+                -f segment -segment_time 5 -c copy "target_path/{base}_%3d.wav"', shell=True)
     return
