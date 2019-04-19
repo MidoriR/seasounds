@@ -142,7 +142,7 @@ def cut_sounds(sound_directory, time):
 
     Parameters
     ----------
-    sound_file: str  path to the directory for the audio file
+    sound_directory: str  path to the directory for the audio file
     time: str duration of the splits
 
     Returns
@@ -151,15 +151,19 @@ def cut_sounds(sound_directory, time):
 
     """
     target_path = f'{sound_directory}/split_{time}'
-    subprocess.run(f'mkdir {target_path}')
-    audio_files = os.listdir(sound_directory)
+    subprocess.run(f'mkdir {target_path}', shell=True)
+    print(f'Creating the {target_path} folder')
+    audio_files = [file for file in os.listdir(sound_directory) if not file.startswith('split_')]
     time_cmd = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "
     for element in audio_files: 
-        output = subprocess.check_output(time_cmd + f'{sound_directory}/' + element, shell=True) 
+        full = f'{time_cmd}{sound_directory}/{element}'
+        output = subprocess.check_output(full, shell=True) 
         if float(output) < 6:
-            subprocess.run(f'cp {sound_directory}/{element} split_wav/', shell=True) 
+            subprocess.run(f'cp {sound_directory}/{element} {target_path}/', shell=True) 
         else: 
-            base, _ = element.split('.') 
-            subprocess.run(f'ffmpeg -i {sound_directory}/{element} \
-                -f segment -segment_time 5 -c copy "target_path/{base}_%3d.wav"', shell=True)
+            base, extension = element.split('.')
+            
+            split_cmd = f'ffmpeg -i {sound_directory}/{element} -f segment -segment_time 5 -c copy "{target_path}/{base}_%3d.{extension}"'
+            print(split_cmd)
+            subprocess.run(split_cmd, shell=True)
     return
