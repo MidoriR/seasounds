@@ -2,7 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 """
-This is module of the seasounds library.
+Module for constructing dataset.
+
+Author: Erika Peláez.
+MIT license
 
 This module contains all the functions to create your own dataset for classification with Machine Learning.
 All data was collected from the Watkins Marine Mammals database.
@@ -158,7 +161,7 @@ def cut_sounds(sound_directory, time):
     for element in audio_files: 
         full = f'{time_cmd}{sound_directory}/{element}'
         output = subprocess.check_output(full, shell=True) 
-        if float(output) < 6:
+        if float(output) < int(time) + 1:
             subprocess.run(f'cp {sound_directory}/{element} {target_path}/', shell=True) 
         else: 
             base, extension = element.split('.')
