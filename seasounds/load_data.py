@@ -31,16 +31,16 @@ def batch_loader(files_path, time_limit, batch_size=100):
 
     """
     file_list = os.listdir(files_path)
-    sampling_rate = []
-    sounds = []
     for number in range(len(file_list)//batch_size):
+        sampling_rates = []
+        sounds = []
         lower_index = number * batch_size
         upper_index = (number + 1) * batch_size
         for audio_file in file_list[lower_index:upper_index]:
             sound, sampling = librosa.load(f'{files_path}/{audio_file}', duration=time_limit)
             sounds.append(sound)
-            sampling.append(sound)
-        yield sampling_rate, sounds
+            sampling_rates.append(sampling)
+        yield file_list[lower_index:upper_index], sampling_rates, sounds
 
 
 

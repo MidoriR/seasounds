@@ -25,7 +25,7 @@ def load_pkl(file_path):
     Trained model object.
 
     """
-    with open(file_path) as model:
+    with open(file_path, 'rb') as model:
         clf = pickle.load(model)
         return clf
 
@@ -47,5 +47,6 @@ def predict_rf(model, data, file_names):
     probabilities = model.predict_proba(data)
     result = pd.DataFrame({'file_name':file_names,
                            'prediction': predictions,
-                           'probabilities': probabilities})
+                           'prob_orca': probabilities[:, 1]
+                           })
     return result
